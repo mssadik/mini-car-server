@@ -6,7 +6,7 @@ const { MongoClient, ServerApiVersion } = require('mongodb');
 const port = process.env.PORT || 5000;
 
 
-//middelware
+//meddelware
 app.use(cors());
 app.use(express.json());
 
@@ -26,6 +26,16 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+
+    const carCollection = client.db('miniCarDB').collection('miniCar');
+
+    app.post('/cars', async(req, res) =>{
+      const car = req.body;
+      console.log(car);
+      const result = await carCollection.insertOne(car)
+      res.send(result);
+    })
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
@@ -42,5 +52,5 @@ app.get('/', (req, res)=>{
 })
 
 app.listen(port, () =>{
-    console.log(`This server is running on port: ${port}`)
+    console.log(`Mini car  is running on port: ${port}`)
 })
