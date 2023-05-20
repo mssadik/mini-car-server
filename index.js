@@ -28,6 +28,12 @@ async function run() {
     // await client.connect();
 
     const carCollection = client.db('miniCarDB').collection('miniCar');
+    const categoryCollection = client.db('categoryDB').collection('category');
+
+    app.get('/category', async(req, res) =>{
+      const result = await categoryCollection.find().toArray();
+      res.send(result)
+    })
 
     app.get('/cars', async(req, res) =>{
       const result = await carCollection.find().toArray();
