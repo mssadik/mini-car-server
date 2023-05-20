@@ -25,7 +25,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     const carCollection = client.db('miniCarDB').collection('miniCar');
 
@@ -42,6 +42,15 @@ async function run() {
       };
       const result = await carCollection.findOne(query, options);
       res.send(result)
+    })
+
+    app.get('/carss', async(req, res) =>{
+      let query = {};
+      if(req.query?.sellerEmail) {
+        query = {sellerEmail: req.query.sellerEmail}
+      }
+      const result = await carCollection.find(query).toArray();
+      res.send(result);
     })
 
     app.post('/cars', async(req, res) =>{
