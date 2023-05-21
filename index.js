@@ -67,7 +67,23 @@ async function run() {
       res.send(result);
     })
 
-    app.post('/cars', async (req, res) => {
+    //for sorting
+    app.get('/carss', async (req, res) => {
+      const sortParam = req.query.sort || 'asc'; // Default sorting order is ascending
+    
+      let sortOptions = {};
+      if (sortParam === 'asc') {
+        sortOptions = { price: 1 }; // Sort in ascending order by price
+      } else if (sortParam === 'desc') {
+        sortOptions = { price: -1 }; // Sort in descending order by price
+      }
+    
+      const result = await carCollection.find().sort(sortOptions).toArray();
+      res.send(result);
+    });
+    
+
+    app.post('/carss', async (req, res) => {
       const car = req.body;
       console.log(car);
       const result = await carCollection.insertOne(car)
