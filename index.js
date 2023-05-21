@@ -30,45 +30,74 @@ async function run() {
     const carCollection = client.db('miniCarDB').collection('miniCar');
     const categoryCollection = client.db('categoryDB').collection('category');
 
-    app.get('/category', async(req, res) =>{
+    app.get('/category', async (req, res) => {
       const result = await categoryCollection.find().toArray();
       res.send(result)
     })
 
-    app.get('/cars', async(req, res) =>{
+    app.get('/cars', async (req, res) => {
       const result = await carCollection.find().toArray();
       res.send(result);
     })
 
-    app.get('/cars/:id', async(req, res) =>{
+    app.get('/cars/:id', async (req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)}
+      const query = { _id: new ObjectId(id) }
       const options = {
-        projection: {decription:1, photo:1, price:1, quantity:1, rating:1, sellerEmail:1, sellerName:1, subCategory:1, toyName:1}
+        projection: { decription: 1, photo: 1, price: 1, quantity: 1, rating: 1, sellerEmail: 1, sellerName: 1, subCategory: 1, toyName: 1 }
       };
       const result = await carCollection.findOne(query, options);
       res.send(result)
     })
 
-    app.get('/carss', async(req, res) =>{
+    //get api for update
+    app.get('/cars/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await carCollection.findOne(query);
+      res.send(result);
+    })
+
+    app.get('/carss', async (req, res) => {
       let query = {};
-      if(req.query?.sellerEmail) {
-        query = {sellerEmail: req.query.sellerEmail}
+      if (req.query?.sellerEmail) {
+        query = { sellerEmail: req.query.sellerEmail }
       }
       const result = await carCollection.find(query).toArray();
       res.send(result);
     })
 
-    app.post('/cars', async(req, res) =>{
+    app.post('/cars', async (req, res) => {
       const car = req.body;
       console.log(car);
       const result = await carCollection.insertOne(car)
       res.send(result);
     })
 
-    app.delete('/cars/:id', async(req, res) =>{
+    app.put('/cars/:id', async (req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)}
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updatedCar = req.body;
+      const car = {
+        $set: {
+          photo: updatedCar.photo,
+          toyName: updatedCar.toyName,
+          sellerName: updatedCar.sellerName,
+          subCategory: updatedCar.subCategory,
+          rating: updatedCar.rating,
+          quantity: updatedCar.quantity,
+          decription: updatedCar.decription,
+          price: updatedCar.price
+        }
+      }
+      const result = await carCollection.updateOne(filter, car, options);
+      res.send(result);
+    })
+
+    app.delete('/cars/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
       const result = await carCollection.deleteOne(query);
       res.send(result);
     })
@@ -84,10 +113,10 @@ async function run() {
 run().catch(console.dir);
 
 
-app.get('/', (req, res)=>{
-    res.send('this server is runnint')
+app.get('/', (req, res) => {
+  res.send('this server is runnint')
 })
 
-app.listen(port, () =>{
-    console.log(`Mini car  is running on port: ${port}`)
+app.listen(port, () => {
+  console.log(`Mini car  is running on port: ${port}`)
 })
